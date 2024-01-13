@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
 import org.apache.maven.settings.Settings;
@@ -364,6 +365,63 @@ class DefaultMavenResourcesFilteringTest {
         assertEquals("${}", result.getProperty("emptyexpression2"));
         File imageFile = new File(outputDirectory, "happy_duke.gif");
         assertTrue(filesAreIdentical(initialImageFile, imageFile));
+    }
+
+    @Test
+    void messageWhenCopyingFromSubDirectory() throws Exception {
+
+        String subDirectory = "src/test/units-files/maven-resources-filtering";
+        String unitFilesDir = formattedPath(getBasedir(), subDirectory);
+
+        assertMessage(
+                unitFilesDir,
+                "Copying (\\d)+ resources from " + subDirectory + " to "
+                        + formattedPath("target", "DefaultMavenResourcesFilteringTest"));
+    }
+
+    @Test
+    void messageWhenCopyingFromBaseDir() throws Exception {
+
+        String unitFilesDir = getBasedir();
+
+        assertMessage(
+                unitFilesDir,
+                "Copying (\\d)+ resources from . to " + formattedPath("target", "DefaultMavenResourcesFilteringTest"));
+    }
+
+    private void assertMessage(String directory, String expectedMessagePattern) throws Exception {
+        Resource resource = new Resource();
+        List<Resource> resources = new ArrayList<>();
+        resources.add(resource);
+
+        resource.setDirectory(directory);
+        resource.setFiltering(false);
+
+        MavenResourcesExecution mre = new MavenResourcesExecution();
+        mre.setResources(resources);
+        mre.setOutputDirectory(outputDirectory);
+        mre.setEncoding("UTF-8");
+        mre.setMavenProject(mavenProject);
+        mre.setFilters(null);
+        mre.setNonFilteredFileExtensions(Collections.emptyList());
+        mre.setMavenSession(new StubMavenSession());
+
+        ConsoleHolder console = ConsoleHolder.start();
+
+        mavenResourcesFiltering.filterResources(mre);
+
+        String output = console.getError();
+        String marker = DefaultMavenResourcesFiltering.class.getSimpleName();
+        String message =
+                output.substring(output.indexOf(marker) + marker.length() + 3).trim();
+
+        boolean matches = message.matches(expectedMessagePattern);
+        assertTrue(matches, "expected: " + expectedMessagePattern + " does not match actual: " + message);
+        console.release();
+    }
+
+    private String formattedPath(String... path) {
+        return StringUtils.join(path, File.separatorChar);
     }
 
     private static boolean filesAreIdentical(File expected, File current) throws IOException {
