@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
 import org.apache.maven.settings.Settings;
@@ -370,13 +369,12 @@ class DefaultMavenResourcesFilteringTest {
     @Test
     void messageWhenCopyingFromSubDirectory() throws Exception {
 
-        String subDirectory = formattedPath("src", "test", "units-files", "maven-resources-filtering");
-        String unitFilesDir = formattedPath(getBasedir(), subDirectory);
+        String subDirectory = "src/test/units-files/maven-resources-filtering";
+        String unitFilesDir = String.format("%s/%s", getBasedir(), subDirectory);
 
         assertMessage(
                 unitFilesDir,
-                "Copying (\\d)+ resources from " + subDirectory + " to "
-                        + formattedPath("target", "DefaultMavenResourcesFilteringTest"));
+                "Copying (\\d)+ resources from " + subDirectory + " to target/DefaultMavenResourcesFilteringTest");
     }
 
     @Test
@@ -384,9 +382,7 @@ class DefaultMavenResourcesFilteringTest {
 
         String unitFilesDir = getBasedir();
 
-        assertMessage(
-                unitFilesDir,
-                "Copying (\\d)+ resources from . to " + formattedPath("target", "DefaultMavenResourcesFilteringTest"));
+        assertMessage(unitFilesDir, "Copying (\\d)+ resources from . to target/DefaultMavenResourcesFilteringTest");
     }
 
     private void assertMessage(String directory, String expectedMessagePattern) throws Exception {
@@ -412,18 +408,13 @@ class DefaultMavenResourcesFilteringTest {
 
         String output = console.getError();
         String marker = DefaultMavenResourcesFiltering.class.getSimpleName();
-        String message =
-                output.substring(output.indexOf(marker) + marker.length() + 3).trim();
+        String message = output.substring(output.indexOf(marker) + marker.length() + 3)
+                .trim()
+                .replaceAll("\\\\", "/");
 
-        System.out.println(message);
-        System.out.println(expectedMessagePattern);
         boolean matches = message.matches(expectedMessagePattern);
         assertTrue(matches, "expected: '" + expectedMessagePattern + "' does not match actual: '" + message + "'");
         console.release();
-    }
-
-    private String formattedPath(String... path) {
-        return StringUtils.join(path, File.separatorChar == '/' ? "/" : "\\");
     }
 
     private static boolean filesAreIdentical(File expected, File current) throws IOException {
