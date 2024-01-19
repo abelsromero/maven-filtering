@@ -32,6 +32,7 @@ jobs:
       max-parallel: 12
       matrix:
         os:
+          - ubuntu-latest
           - windows-latest
         java:
           - 8
