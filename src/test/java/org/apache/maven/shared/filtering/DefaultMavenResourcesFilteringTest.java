@@ -415,6 +415,8 @@ class DefaultMavenResourcesFilteringTest {
         String message =
                 output.substring(output.indexOf(marker) + marker.length() + 3).trim();
 
+        System.out.println(message);
+        System.out.println(expectedMessagePattern);
         boolean matches = message.matches(expectedMessagePattern);
         assertTrue(matches, "expected: '" + expectedMessagePattern + "' does not match actual: '" + message + "'");
         console.release();
