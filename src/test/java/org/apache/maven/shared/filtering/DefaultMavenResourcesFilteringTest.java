@@ -370,7 +370,7 @@ class DefaultMavenResourcesFilteringTest {
     @Test
     void messageWhenCopyingFromSubDirectory() throws Exception {
 
-        String subDirectory = "src/test/units-files/maven-resources-filtering";
+        String subDirectory = formattedPath("src", "test", "units-files", "maven-resources-filtering");
         String unitFilesDir = formattedPath(getBasedir(), subDirectory);
 
         assertMessage(
@@ -416,7 +416,7 @@ class DefaultMavenResourcesFilteringTest {
                 output.substring(output.indexOf(marker) + marker.length() + 3).trim();
 
         boolean matches = message.matches(expectedMessagePattern);
-        assertTrue(matches, "expected: " + expectedMessagePattern + " does not match actual: " + message);
+        assertTrue(matches, "expected: '" + expectedMessagePattern + "' does not match actual: '" + message + "'");
         console.release();
     }
 
