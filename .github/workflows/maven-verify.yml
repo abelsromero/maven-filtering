@@ -2,18 +2,10 @@ name: Build
 on:
   push:
     branches:
-      - main
-      - 2.2.x
-    paths-ignore:
-      - README.adoc
-      - docs/**
+      - master
   pull_request:
     branches:
-      - main
-      - 2.2.x
-    paths-ignore:
-      - README.adoc
-      - docs/**
+      - master
 
 jobs:
   build:
