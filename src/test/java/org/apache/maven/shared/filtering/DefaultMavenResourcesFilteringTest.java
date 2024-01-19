@@ -421,7 +421,7 @@ class DefaultMavenResourcesFilteringTest {
     }
 
     private String formattedPath(String... path) {
-        return StringUtils.join(path, File.separatorChar);
+        return StringUtils.join(path, File.separatorChar == '/' ? "/" : "\\");
     }
 
     private static boolean filesAreIdentical(File expected, File current) throws IOException {
